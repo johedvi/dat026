@@ -64,7 +64,7 @@ public final class Animator extends JPanel implements ActionListener {
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         // clear the canvas
-        g2.setColor(Color.WHITE);
+        g2.setColor(Color.gray);
         g2.fillRect(0, 0, this.getWidth(), this.getHeight());
         // draw balls
         g2.setColor(Color.RED);

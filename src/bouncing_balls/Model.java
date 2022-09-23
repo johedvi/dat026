@@ -30,8 +30,8 @@ class Model {
 
         // Initialize the model with a few balls
         balls = new Ball[2];
-        balls[0] = new Ball(width / 3, height * 0.5, 1, 0.25, 0.2, 3);
-        balls[1] = new Ball(2 * width / 3, height * 0.5, -1.25, -0.5, 0.3, 2);
+        balls[0] = new Ball(width / 4, height * 0.9, 1, -1, 0.2, 2);
+        balls[1] = new Ball(3 * width / 4, height * 0.1, -1, 1, 0.2, 2);
 
         totalRadius = balls[0].radius + balls[1].radius;
     }
@@ -49,22 +49,26 @@ class Model {
 
             }
 
-            if (b.position.x < b.radius || b.position.x > areaWidth - b.radius) {
-
+            if (b.position.x < b.radius) {
+                b.position.x = b.radius;
                 b.velocity.x *= -1; // change direction of ball
-
             }
-            if (b.position.y < b.radius || b.position.y > areaHeight - b.radius) {
-
+            if(b.position.x > areaWidth - b.radius) {
+                b.position.x = areaWidth - b.radius;
+                b.velocity.x *= -1;
+            }
+            if (b.position.y < b.radius) {
+                b.position.y = b.radius;
                 b.velocity.y *= -1;
 
-            } else {
-                ballsIsInGround = false;
+            }
+            if(b.position.y > areaHeight - b.radius) {
+                b.position.y = areaHeight - b.radius;
+                b.velocity.y *= -1;
             }
 
-            if(!ballsIsInGround) {
-               b.velocity.y -= 0.2;
-            }
+            //b.velocity.y -= 9.82 * deltaT;
+
 
             moveBalls(deltaT, b);
 
@@ -105,7 +109,7 @@ class Model {
 
         Vector v1 = new Vector(b1.velocity.x, b1.velocity.y);
         Vector v2 = new Vector(b2.velocity.x, b2.velocity.y);
-
+        
 
         double dx = Math.abs(b1.position.x - b2.position.x);
         double dy = Math.abs(b1.position.y - b2.position.y);
@@ -114,6 +118,35 @@ class Model {
         double [][] rotation = generateRotationMatrix(contactAngle);
         double [][] rotationInverse = generateInverseRotationMatrix(contactAngle);
 
+
+        if(b1.position.x > b2.position.x) {
+            b1.position.x = b2.position.x + (b1.radius + b2.radius) * Math.cos(contactAngle);
+            b1.position.y = b2.position.y + (b1.radius + b2.radius) * Math.sin(contactAngle);
+        }
+        else {
+            b2.position.x = b1.position.x + (b1.radius + b2.radius) * Math.cos(contactAngle);
+            b2.position.y = b1.position.y + (b1.radius + b2.radius) * Math.sin(contactAngle);
+        }
+
+
+        //Vector p1 = b1.position;
+        //Vector p2 = b2.position;
+//
+//        //p1 = new Vector(rotation[0][0]*p1.x + rotation[0][1]*p1.y,rotation[1][0]*p1.x + rotation[1][1]*p1.y);
+//        //p2 = new Vector(rotation[0][0]*p2.x + rotation[0][1]*p2.y,rotation[1][0]*p2.x + rotation[1][1]*p2.y);
+//
+//        //if(p1.x < p2.x)
+//        //    p2.x = p1.x + b1.radius + b2.radius;
+//        //else
+//        //    p1.x = p2.x + b1.radius + b2.radius;
+//
+//        //p1 = new Vector(rotationInverse[0][0]*p1.x + rotationInverse[0][1]*p1.y,rotationInverse[1][0]*p1.x + rotationInverse[1][1]*p1.y);
+//        //p2 = new Vector(rotationInverse[0][0]*p2.x + rotationInverse[0][1]*p2.y,rotationInverse[1][0]*p2.x + rotationInverse[1][1]*p2.y);
+//
+//        //b1.position.x = p1.x;
+//        //b1.position.y = p1.y;
+        //b2.position.x = p2.x;
+        //b2.position.y = p2.y;
 
         v1 = new Vector(rotation[0][0]*v1.x + rotation[0][1]*v1.y,rotation[1][0]*v1.x + rotation[1][1]*v1.y);
         v2 = new Vector(rotation[0][0]*v2.x + rotation[0][1]*v2.y,rotation[1][0]*v2.x + rotation[1][1]*v2.y);
