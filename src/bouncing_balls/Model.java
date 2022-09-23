@@ -30,8 +30,8 @@ class Model {
 
         // Initialize the model with a few balls
         balls = new Ball[2];
-        balls[0] = new Ball(width / 4, height * 0.9, 1, -1, 0.2, 2);
-        balls[1] = new Ball(3 * width / 4, height * 0.1, -1, 1, 0.2, 2);
+        balls[0] = new Ball(width / 4, height * 0.1, 1, 1, 0.3, 3);
+        balls[1] = new Ball(3 * width / 4, height * 0.9, 0, 0, 0.3, 3);
 
         totalRadius = balls[0].radius + balls[1].radius;
     }
@@ -49,24 +49,27 @@ class Model {
 
             }
 
-            if (b.position.x < b.radius) {
-                b.position.x = b.radius;
-                b.velocity.x *= -1; // change direction of ball
-            }
-            if(b.position.x > areaWidth - b.radius) {
-                b.position.x = areaWidth - b.radius;
-                b.velocity.x *= -1;
-            }
-            if (b.position.y < b.radius) {
+            // change direction of ball
+            if (b.position.x < b.radius || b.position.x > areaWidth - b.radius) {
+				b.velocity.x *= -1;
+			}
+			if (b.position.y < b.radius || b.position.y > areaHeight - b.radius) {
+				b.velocity.y *= -1;
+			}
+            
+            // Adjust position so no sex with floor
+            if(b.position.y < b.radius)
                 b.position.y = b.radius;
-                b.velocity.y *= -1;
-
-            }
-            if(b.position.y > areaHeight - b.radius) {
+            else if(b.position.y > areaHeight - b.radius)
                 b.position.y = areaHeight - b.radius;
-                b.velocity.y *= -1;
-            }
 
+            if(b.position.x < b.radius)
+                b.position.x = b.radius;
+            else if(b.position.x > areaWidth - b.radius)
+                b.position.x = areaWidth - b.radius;
+
+
+            //Gravity
             //b.velocity.y -= 9.82 * deltaT;
 
 
@@ -101,7 +104,7 @@ class Model {
     // #https://www.youtube.com/watch?v=guWIF87CmBg lemao
 
     void collision (Ball b1, Ball b2) {
-
+        System.out.println("Collision");
         double vx1 = b1.velocity.x;
         double vy1 = b1.velocity.y;
         double vx2 = b2.velocity.x;
@@ -111,22 +114,40 @@ class Model {
         Vector v2 = new Vector(b2.velocity.x, b2.velocity.y);
         
 
-        double dx = Math.abs(b1.position.x - b2.position.x);
-        double dy = Math.abs(b1.position.y - b2.position.y);
+        double dx = b1.position.x - b2.position.x;
+        double dy = b1.position.y - b2.position.y;
 
         double contactAngle = Math.atan(dy/dx);
         double [][] rotation = generateRotationMatrix(contactAngle);
         double [][] rotationInverse = generateInverseRotationMatrix(contactAngle);
 
 
-        if(b1.position.x > b2.position.x) {
-            b1.position.x = b2.position.x + (b1.radius + b2.radius) * Math.cos(contactAngle);
-            b1.position.y = b2.position.y + (b1.radius + b2.radius) * Math.sin(contactAngle);
+        double totRadius = b1.radius + b2.radius;
+
+        System.out.println("angle: " + contactAngle * 180/Math.PI);
+        
+        if((b1.position.x > b2.position.x) && (b1.position.y > b2.position.y)) {
+            System.out.println("kvadrant 1");
+            b1.position.x = b2.position.x + totRadius * Math.cos(contactAngle);
+            b1.position.y = b2.position.y + totRadius * Math.sin(contactAngle);
         }
-        else {
-            b2.position.x = b1.position.x + (b1.radius + b2.radius) * Math.cos(contactAngle);
-            b2.position.y = b1.position.y + (b1.radius + b2.radius) * Math.sin(contactAngle);
+        else if(b1.position.x < b2.position.x && (b1.position.y > b2.position.y)){
+            System.out.println("kvadrant 2");
+            b2.position.x = b1.position.x + totRadius * Math.cos(Math.PI/2 + contactAngle);
+            b2.position.y = b1.position.y + totRadius * Math.sin(Math.PI/2 + contactAngle);
         }
+        else if((b1.position.x < b2.position.x) && (b1.position.y < b2.position.y)) {
+            System.out.println("kvadrant 3");
+
+         
+        }
+        else if((b1.position.x > b2.position.x) && (b1.position.y < b2.position.y)) {
+            System.out.println("kvadrant 4");
+            b1.position.x = b2.position.x + totRadius * Math.cos(contactAngle);
+            b1.position.y = b2.position.y + totRadius * Math.sin(contactAngle);
+        }
+    
+    
 
 
         //Vector p1 = b1.position;
@@ -174,8 +195,8 @@ class Model {
     double[][] generateRotationMatrix(double radianAngle) {
         double[][] rotationMatrix = new double[2][2];
         rotationMatrix[0][0] = Math.cos(radianAngle);
-        rotationMatrix[0][1] = -Math.sin(radianAngle);
-        rotationMatrix[1][0] = Math.sin(radianAngle);
+        rotationMatrix[0][1] = Math.sin(radianAngle);
+        rotationMatrix[1][0] = -Math.sin(radianAngle);
         rotationMatrix[1][1] = Math.cos(radianAngle);
         return rotationMatrix;
     }
@@ -183,8 +204,8 @@ class Model {
     double[][] generateInverseRotationMatrix(double radianAngle) {
         double[][] rotationMatrix = new double[2][2];
         rotationMatrix[0][0] = Math.cos(radianAngle);
-        rotationMatrix[0][1] = Math.sin(radianAngle);
-        rotationMatrix[1][0] = -Math.sin(radianAngle);
+        rotationMatrix[0][1] = -Math.sin(radianAngle);
+        rotationMatrix[1][0] = Math.sin(radianAngle);
         rotationMatrix[1][1] = Math.cos(radianAngle);
         return rotationMatrix;
     }
