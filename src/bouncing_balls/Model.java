@@ -29,8 +29,8 @@ class Model {
 
         // Initialize the model with a few balls
         balls = new Ball[2];
-        balls[0] = new Ball(width / 3, height * .5, 0, -1, 0.3, 1);
-        balls[1] = new Ball(2 * width / 3, height * .5, 0, 0, 0.4, 3);
+        balls[0] = new Ball(width / 3, height * .5, 1, -1, 0.3, 1);
+        balls[1] = new Ball(2 * width / 3, height * .5, 1, 0, 0.4, 3);
 
         totalRadius = balls[0].radius + balls[1].radius;
     }
@@ -42,7 +42,8 @@ class Model {
         Ball ball_0 = balls[0];
         Ball ball_1 = balls[1];
 
-
+        ball_0.mass = 2;
+        ball_1.mass = 4;
 
 
         collisionTimer += deltaT;

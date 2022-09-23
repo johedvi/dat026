@@ -1,0 +1,19 @@
+<changelist name="Uncommitted_changes_before_Checkout_at_2022-09-23_16_03_[Default_Changelist]1" date="1663941816885" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2022-09-23_16_03_[Default_Changelist]1/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 2022-09-23 16:03 [Default Changelist]" />
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/dat026/bouncing_balls/Model$Ball.class" />
+    <option name="AFTER_PATH" value="out/production/dat026/bouncing_balls/Model$Ball.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2022-09-23_16_03_[Default_Changelist]1/Model$Ball.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/dat026/bouncing_balls/Animator.class" />
+    <option name="AFTER_PATH" value="out/production/dat026/bouncing_balls/Animator.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2022-09-23_16_03_[Default_Changelist]1/Animator.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/dat026/bouncing_balls/Model.class" />
+    <option name="AFTER_PATH" value="out/production/dat026/bouncing_balls/Model.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2022-09-23_16_03_[Default_Changelist]1/Model.class" />
+  </binary>
+</changelist>

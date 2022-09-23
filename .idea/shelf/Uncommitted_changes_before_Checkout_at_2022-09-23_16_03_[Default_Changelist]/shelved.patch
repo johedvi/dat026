@@ -1,0 +1,236 @@
+Index: src/bouncing_balls/Model.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package bouncing_balls;\r\n\r\nimport java.util.Arrays;\r\n\r\n/**\r\n * The physics model.\r\n * <p>\r\n * This class is where you should implement your bouncing balls model.\r\n * <p>\r\n * The code has intentionally been kept as simple as possible, but if you wish, you can improve the design.\r\n *\r\n * @author Simon Robillard\r\n */\r\nclass Model {\r\n\r\n    double areaWidth, areaHeight;\r\n\r\n    Ball[] balls;\r\n\r\n    double totalRadius;\r\n\r\n\r\n\r\n    boolean ballsIsFrozen = false;\r\n    boolean ballsIsInGround = true;\r\n\r\n    Model(double width, double height) {\r\n        areaWidth = width;\r\n        areaHeight = height;\r\n\r\n        // Initialize the model with a few balls\r\n        balls = new Ball[2];\r\n        balls[0] = new Ball(width / 4, height * 0.1, 1, 1, 0.3, 3);\r\n        balls[1] = new Ball(3 * width / 4, height * 0.9, 0, 0, 0.3, 3);\r\n\r\n        totalRadius = balls[0].radius + balls[1].radius;\r\n    }\r\n\r\n\r\n    void step(double deltaT) {\r\n        // TODO this method implements one step of simulation with a step deltaT\r\n\r\n        for (Ball b : balls) {\r\n            // detect collision with the border\r\n\r\n            if (circlesIsIntersecting()) {\r\n\r\n                collision(balls[0],balls[1]);\r\n\r\n            }\r\n\r\n            // change direction of ball\r\n            if (b.position.x < b.radius || b.position.x > areaWidth - b.radius) {\r\n\t\t\t\tb.velocity.x *= -1;\r\n\t\t\t}\r\n\t\t\tif (b.position.y < b.radius || b.position.y > areaHeight - b.radius) {\r\n\t\t\t\tb.velocity.y *= -1;\r\n\t\t\t}\r\n            \r\n            // Adjust position so no sex with floor\r\n            if(b.position.y < b.radius)\r\n                b.position.y = b.radius;\r\n            else if(b.position.y > areaHeight - b.radius)\r\n                b.position.y = areaHeight - b.radius;\r\n\r\n            if(b.position.x < b.radius)\r\n                b.position.x = b.radius;\r\n            else if(b.position.x > areaWidth - b.radius)\r\n                b.position.x = areaWidth - b.radius;\r\n\r\n\r\n            //Gravity\r\n            //b.velocity.y -= 9.82 * deltaT;\r\n\r\n\r\n            moveBalls(deltaT, b);\r\n\r\n\r\n\r\n        }\r\n\r\n\r\n        // Handle collisions in between circles\r\n    }\r\n\r\n\r\n\r\n\r\n    private void moveBalls(double deltaT, Ball b) {\r\n        // compute new position according to the speed of the ball\r\n        b.position.x += deltaT * b.velocity.x;\r\n        b.position.y += deltaT * b.velocity.y;\r\n    }\r\n\r\n    boolean circlesIsIntersecting() {\r\n        // Pythagoras\r\n        double distanceBetweenCircles = Math.sqrt(Math.pow(balls[0].position.x - balls[1].position.x, 2) + Math.pow(balls[0].position.y - balls[1].position.y, 2));\r\n        return distanceBetweenCircles < totalRadius;\r\n    }\r\n\r\n\r\n\r\n\r\n    // #https://www.youtube.com/watch?v=guWIF87CmBg lemao\r\n\r\n    void collision (Ball b1, Ball b2) {\r\n        System.out.println(\"Collision\");\r\n        double vx1 = b1.velocity.x;\r\n        double vy1 = b1.velocity.y;\r\n        double vx2 = b2.velocity.x;\r\n        double vy2 = b2.velocity.y;\r\n\r\n        Vector v1 = new Vector(b1.velocity.x, b1.velocity.y);\r\n        Vector v2 = new Vector(b2.velocity.x, b2.velocity.y);\r\n        \r\n\r\n        double dx = b1.position.x - b2.position.x;\r\n        double dy = b1.position.y - b2.position.y;\r\n\r\n        double contactAngle = Math.atan(dy/dx);\r\n        double [][] rotation = generateRotationMatrix(contactAngle);\r\n        double [][] rotationInverse = generateInverseRotationMatrix(contactAngle);\r\n\r\n\r\n        double totRadius = b1.radius + b2.radius;\r\n\r\n        System.out.println(\"angle: \" + contactAngle * 180/Math.PI);\r\n        \r\n        if((b1.position.x > b2.position.x) && (b1.position.y > b2.position.y)) {\r\n            System.out.println(\"kvadrant 1\");\r\n            b1.position.x = b2.position.x + totRadius * Math.cos(contactAngle);\r\n            b1.position.y = b2.position.y + totRadius * Math.sin(contactAngle);\r\n        }\r\n        else if(b1.position.x < b2.position.x && (b1.position.y > b2.position.y)){\r\n            System.out.println(\"kvadrant 2\");\r\n            b2.position.x = b1.position.x + totRadius * Math.cos(Math.PI/2 + contactAngle);\r\n            b2.position.y = b1.position.y + totRadius * Math.sin(Math.PI/2 + contactAngle);\r\n        }\r\n        else if((b1.position.x < b2.position.x) && (b1.position.y < b2.position.y)) {\r\n            System.out.println(\"kvadrant 3\");\r\n\r\n         \r\n        }\r\n        else if((b1.position.x > b2.position.x) && (b1.position.y < b2.position.y)) {\r\n            System.out.println(\"kvadrant 4\");\r\n            b1.position.x = b2.position.x + totRadius * Math.cos(contactAngle);\r\n            b1.position.y = b2.position.y + totRadius * Math.sin(contactAngle);\r\n        }\r\n    \r\n    \r\n\r\n\r\n        //Vector p1 = b1.position;\r\n        //Vector p2 = b2.position;\r\n//\r\n//        //p1 = new Vector(rotation[0][0]*p1.x + rotation[0][1]*p1.y,rotation[1][0]*p1.x + rotation[1][1]*p1.y);\r\n//        //p2 = new Vector(rotation[0][0]*p2.x + rotation[0][1]*p2.y,rotation[1][0]*p2.x + rotation[1][1]*p2.y);\r\n//\r\n//        //if(p1.x < p2.x)\r\n//        //    p2.x = p1.x + b1.radius + b2.radius;\r\n//        //else\r\n//        //    p1.x = p2.x + b1.radius + b2.radius;\r\n//\r\n//        //p1 = new Vector(rotationInverse[0][0]*p1.x + rotationInverse[0][1]*p1.y,rotationInverse[1][0]*p1.x + rotationInverse[1][1]*p1.y);\r\n//        //p2 = new Vector(rotationInverse[0][0]*p2.x + rotationInverse[0][1]*p2.y,rotationInverse[1][0]*p2.x + rotationInverse[1][1]*p2.y);\r\n//\r\n//        //b1.position.x = p1.x;\r\n//        //b1.position.y = p1.y;\r\n        //b2.position.x = p2.x;\r\n        //b2.position.y = p2.y;\r\n\r\n        v1 = new Vector(rotation[0][0]*v1.x + rotation[0][1]*v1.y,rotation[1][0]*v1.x + rotation[1][1]*v1.y);\r\n        v2 = new Vector(rotation[0][0]*v2.x + rotation[0][1]*v2.y,rotation[1][0]*v2.x + rotation[1][1]*v2.y);\r\n\r\n\r\n        v1.x = (vx1 * (b1.mass - b2.mass) + 2 * b2.mass * vx2) / (b1.mass + b2.mass);\r\n        v2.x = (vx2 * (b2.mass - b1.mass) + 2 * b1.mass * vx1) / (b1.mass + b2.mass);\r\n        v1.y = (vy1 * (b1.mass - b2.mass) + 2 * b2.mass * vy2) / (b1.mass + b2.mass);\r\n        v2.y = (vy2 * (b2.mass - b1.mass) + 2 * b1.mass * vy1) / (b1.mass + b2.mass);\r\n\r\n\r\n        v1 = new Vector(rotationInverse[0][0]*v1.x + rotationInverse[0][1]*v1.y,rotationInverse[1][0]*v1.x + rotationInverse[1][1]*v1.y);\r\n        v2 = new Vector(rotationInverse[0][0]*v2.x + rotationInverse[0][1]*v2.y,rotationInverse[1][0]*v2.x + rotationInverse[1][1]*v2.y);\r\n\r\n\r\n        b1.velocity.x = v1.x;\r\n        b1.velocity.y = v1.y;\r\n        b2.velocity.x = v2.x;\r\n        b2.velocity.y = v2.y;\r\n    }\r\n\r\n\r\n\r\n\r\n    double[][] generateRotationMatrix(double radianAngle) {\r\n        double[][] rotationMatrix = new double[2][2];\r\n        rotationMatrix[0][0] = Math.cos(radianAngle);\r\n        rotationMatrix[0][1] = Math.sin(radianAngle);\r\n        rotationMatrix[1][0] = -Math.sin(radianAngle);\r\n        rotationMatrix[1][1] = Math.cos(radianAngle);\r\n        return rotationMatrix;\r\n    }\r\n\r\n    double[][] generateInverseRotationMatrix(double radianAngle) {\r\n        double[][] rotationMatrix = new double[2][2];\r\n        rotationMatrix[0][0] = Math.cos(radianAngle);\r\n        rotationMatrix[0][1] = -Math.sin(radianAngle);\r\n        rotationMatrix[1][0] = Math.sin(radianAngle);\r\n        rotationMatrix[1][1] = Math.cos(radianAngle);\r\n        return rotationMatrix;\r\n    }\r\n\r\n\r\n    /**\r\n     * Simple inner class describing balls.\r\n     */\r\n    class Ball {\r\n        Vector position;\r\n        Vector velocity;\r\n        double radius;\r\n        double mass;\r\n\r\n        Ball(double x, double y, double vx, double vy, double r, double m) {\r\n            position = new Vector(x, y);\r\n            velocity = new Vector(vx, vy);\r\n            radius = r;\r\n            mass = m;\r\n        }\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/bouncing_balls/Model.java b/src/bouncing_balls/Model.java
+--- a/src/bouncing_balls/Model.java	
++++ b/src/bouncing_balls/Model.java	
+@@ -30,8 +30,8 @@
+ 
+         // Initialize the model with a few balls
+         balls = new Ball[2];
+-        balls[0] = new Ball(width / 4, height * 0.1, 1, 1, 0.3, 3);
+-        balls[1] = new Ball(3 * width / 4, height * 0.9, 0, 0, 0.3, 3);
++        balls[0] = new Ball(width / 4, height * 0.5, 1, 1, 0.3, 3);
++        balls[1] = new Ball(3 * width / 4, height * 0.5, 0, 0, 0.3, 3);
+ 
+         totalRadius = balls[0].radius + balls[1].radius;
+     }
+@@ -56,7 +56,7 @@
+ 			if (b.position.y < b.radius || b.position.y > areaHeight - b.radius) {
+ 				b.velocity.y *= -1;
+ 			}
+-            
++
+             // Adjust position so no sex with floor
+             if(b.position.y < b.radius)
+                 b.position.y = b.radius;
+@@ -98,9 +98,6 @@
+         return distanceBetweenCircles < totalRadius;
+     }
+ 
+-
+-
+-
+     // #https://www.youtube.com/watch?v=guWIF87CmBg lemao
+ 
+     void collision (Ball b1, Ball b2) {
+@@ -112,7 +109,7 @@
+ 
+         Vector v1 = new Vector(b1.velocity.x, b1.velocity.y);
+         Vector v2 = new Vector(b2.velocity.x, b2.velocity.y);
+-        
++
+ 
+         double dx = b1.position.x - b2.position.x;
+         double dy = b1.position.y - b2.position.y;
+@@ -125,7 +122,7 @@
+         double totRadius = b1.radius + b2.radius;
+ 
+         System.out.println("angle: " + contactAngle * 180/Math.PI);
+-        
++        /*
+         if((b1.position.x > b2.position.x) && (b1.position.y > b2.position.y)) {
+             System.out.println("kvadrant 1");
+             b1.position.x = b2.position.x + totRadius * Math.cos(contactAngle);
+@@ -138,36 +135,15 @@
+         }
+         else if((b1.position.x < b2.position.x) && (b1.position.y < b2.position.y)) {
+             System.out.println("kvadrant 3");
+-
+-         
+         }
+         else if((b1.position.x > b2.position.x) && (b1.position.y < b2.position.y)) {
+             System.out.println("kvadrant 4");
+             b1.position.x = b2.position.x + totRadius * Math.cos(contactAngle);
+             b1.position.y = b2.position.y + totRadius * Math.sin(contactAngle);
+         }
+-    
+-    
+ 
++         */
+ 
+-        //Vector p1 = b1.position;
+-        //Vector p2 = b2.position;
+-//
+-//        //p1 = new Vector(rotation[0][0]*p1.x + rotation[0][1]*p1.y,rotation[1][0]*p1.x + rotation[1][1]*p1.y);
+-//        //p2 = new Vector(rotation[0][0]*p2.x + rotation[0][1]*p2.y,rotation[1][0]*p2.x + rotation[1][1]*p2.y);
+-//
+-//        //if(p1.x < p2.x)
+-//        //    p2.x = p1.x + b1.radius + b2.radius;
+-//        //else
+-//        //    p1.x = p2.x + b1.radius + b2.radius;
+-//
+-//        //p1 = new Vector(rotationInverse[0][0]*p1.x + rotationInverse[0][1]*p1.y,rotationInverse[1][0]*p1.x + rotationInverse[1][1]*p1.y);
+-//        //p2 = new Vector(rotationInverse[0][0]*p2.x + rotationInverse[0][1]*p2.y,rotationInverse[1][0]*p2.x + rotationInverse[1][1]*p2.y);
+-//
+-//        //b1.position.x = p1.x;
+-//        //b1.position.y = p1.y;
+-        //b2.position.x = p2.x;
+-        //b2.position.y = p2.y;
+ 
+         v1 = new Vector(rotation[0][0]*v1.x + rotation[0][1]*v1.y,rotation[1][0]*v1.x + rotation[1][1]*v1.y);
+         v2 = new Vector(rotation[0][0]*v2.x + rotation[0][1]*v2.y,rotation[1][0]*v2.x + rotation[1][1]*v2.y);
+Index: src/bouncing_balls/Vector.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package bouncing_balls;\r\n\r\npublic class Vector {\r\n    public double x, y;\r\n\r\n    public static double dotProduct(Vector v1, Vector v2) {\r\n        return (v1.x * v2.x + v1.y * v2.y);\r\n    }\r\n\r\n    public static double vectorMagnitude(Vector v) {\r\n        return Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));\r\n    }\r\n\r\n    public static double slopeBetweenTwoVectors(Vector v1, Vector v2) {\r\n        return (v1.x- v2.x) / (v1.y - v2.y);\r\n    }\r\n\r\n    public static Vector scaleVector(Vector v, double s) {\r\n        return new Vector(v.x * s, v.y * s);\r\n    }\r\n\r\n    public static Vector addVectors(Vector v1, Vector v2) {\r\n        return new Vector(v1.x + v2.x, v1.y + v2.y);\r\n    }\r\n\r\n    public Vector(double x, double y) {\r\n        this.x = x;\r\n        this.y = y;\r\n    }\r\n\r\n    public Vector(Vector v) {\r\n        this.x = v.x;\r\n        this.y = v.y;\r\n    }\r\n\r\n    public void scale(double s) {\r\n        x *= s;\r\n        y *= s;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/bouncing_balls/Vector.java b/src/bouncing_balls/Vector.java
+--- a/src/bouncing_balls/Vector.java	
++++ b/src/bouncing_balls/Vector.java	
+@@ -12,7 +12,16 @@
+     }
+ 
+     public static double slopeBetweenTwoVectors(Vector v1, Vector v2) {
+-        return (v1.x- v2.x) / (v1.y - v2.y);
++        if (v1.x - v2.x == 0) {
++            return Math.PI / 2;
++        } else
++            return (v1.y - v2.y) / (v1.x - v2.x);
++    }
++
++    public static Vector vectorMatrixTransformation(double[][] transformationMatrix, Vector v) {
++        double x = v.x * transformationMatrix[0][0] + v.x * transformationMatrix[0][1];
++        double y = v.y * transformationMatrix[1][0] + v.y * transformationMatrix[1][1];
++        return new Vector(x, y);
+     }
+ 
+     public static Vector scaleVector(Vector v, double s) {
+@@ -37,4 +46,21 @@
+         x *= s;
+         y *= s;
+     }
++
++    @Override
++    public String toString() {
++        return "Vector{" +
++                "x=" + x +
++                ", y=" + y +
++                '}';
++    }
++
++    public double getMagnitude() {
++        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
++    }
++
++    public double getDirectionInRadians() {
++        return Math.atan2(y, x);
++    }
++
+ }
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"BranchesTreeState\">\r\n    <expand>\r\n      <path>\r\n        <item name=\"ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"LOCAL_ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n      </path>\r\n      <path>\r\n        <item name=\"ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"REMOTE_ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n      </path>\r\n      <path>\r\n        <item name=\"ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"REMOTE_ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"GROUP_NODE:origin\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n      </path>\r\n    </expand>\r\n    <select />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"e00698ba-c8e7-47f3-ac87-2f82fc391fe5\" name=\"Default Changelist\" comment=\"\">\r\n      <change afterPath=\"$PROJECT_DIR$/dat026.iml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/.gitignore\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/modules.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/modules.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/uiDesigner.xml\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/vcs.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/vcs.xml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"mavenHome\" value=\"C:\\Users\\johan\\Desktop\\java-devel\\IntelliJ IDEA Community Edition 2020.2.1\\plugins\\maven\\lib\\maven3\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2F8i8cNsNyiJ6wS3lwjonjV7Zvk\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">\r\n    <property name=\"RunOnceActivity.OpenProjectViewOnStart\" value=\"true\" />\r\n    <property name=\"SHARE_PROJECT_CONFIGURATION_FILES\" value=\"true\" />\r\n    <property name=\"last_opened_file_path\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"Animator\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"bouncing_balls.Animator\" />\r\n      <module name=\"dat026\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"bouncing_balls.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Application.Animator\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"e00698ba-c8e7-47f3-ac87-2f82fc391fe5\" name=\"Default Changelist\" comment=\"\" />\r\n      <created>1663879954512</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1663879954512</updated>\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"WindowStateProjectService\">\r\n    <state width=\"1877\" height=\"285\" key=\"GridCell.Tab.0.bottom\" timestamp=\"1663920587080\">\r\n      <screen x=\"0\" y=\"0\" width=\"1920\" height=\"1050\" />\r\n    </state>\r\n    <state width=\"1877\" height=\"285\" key=\"GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050\" timestamp=\"1663920587080\" />\r\n    <state width=\"1877\" height=\"285\" key=\"GridCell.Tab.0.center\" timestamp=\"1663920587079\">\r\n      <screen x=\"0\" y=\"0\" width=\"1920\" height=\"1050\" />\r\n    </state>\r\n    <state width=\"1877\" height=\"285\" key=\"GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050\" timestamp=\"1663920587079\" />\r\n    <state width=\"1877\" height=\"285\" key=\"GridCell.Tab.0.left\" timestamp=\"1663920587079\">\r\n      <screen x=\"0\" y=\"0\" width=\"1920\" height=\"1050\" />\r\n    </state>\r\n    <state width=\"1877\" height=\"285\" key=\"GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050\" timestamp=\"1663920587079\" />\r\n    <state width=\"1877\" height=\"285\" key=\"GridCell.Tab.0.right\" timestamp=\"1663920587080\">\r\n      <screen x=\"0\" y=\"0\" width=\"1920\" height=\"1050\" />\r\n    </state>\r\n    <state width=\"1877\" height=\"285\" key=\"GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050\" timestamp=\"1663920587080\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	
++++ b/.idea/workspace.xml	
+@@ -20,12 +20,7 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="e00698ba-c8e7-47f3-ac87-2f82fc391fe5" name="Default Changelist" comment="">
+-      <change afterPath="$PROJECT_DIR$/dat026.iml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/bouncing_balls/Model.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/bouncing_balls/Model.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -34,6 +29,17 @@
+   </component>
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
++  </component>
++  <component name="GitSEFilterConfiguration">
++    <file-type-list>
++      <filtered-out-file-type name="LOCAL_BRANCH" />
++      <filtered-out-file-type name="REMOTE_BRANCH" />
++      <filtered-out-file-type name="TAG" />
++      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
++    </file-type-list>
++  </component>
++  <component name="MarkdownSettingsMigration">
++    <option name="stateVersion" value="1" />
+   </component>
+   <component name="MavenImportPreferences">
+     <option name="generalSettings">
+@@ -50,7 +56,10 @@
+   <component name="PropertiesComponent">
+     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
++    <property name="WebServerToolWindowFactoryState" value="false" />
++    <property name="dart.analysis.tool.window.visible" value="false" />
+     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
++    <property name="show.migrate.to.gradle.popup" value="false" />
+   </component>
+   <component name="RunManager">
+     <configuration name="Animator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+@@ -80,8 +89,12 @@
+       <option name="number" value="Default" />
+       <option name="presentableId" value="Default" />
+       <updated>1663879954512</updated>
++      <workItem from="1663936457076" duration="285000" />
+     </task>
+     <servers />
++  </component>
++  <component name="TypeScriptGeneratedFilesManager">
++    <option name="version" value="3" />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+     <option name="TAB_STATES">
+@@ -94,22 +107,4 @@
+       </map>
+     </option>
+   </component>
+-  <component name="WindowStateProjectService">
+-    <state width="1877" height="285" key="GridCell.Tab.0.bottom" timestamp="1663920587080">
+-      <screen x="0" y="0" width="1920" height="1050" />
+-    </state>
+-    <state width="1877" height="285" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1663920587080" />
+-    <state width="1877" height="285" key="GridCell.Tab.0.center" timestamp="1663920587079">
+-      <screen x="0" y="0" width="1920" height="1050" />
+-    </state>
+-    <state width="1877" height="285" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1663920587079" />
+-    <state width="1877" height="285" key="GridCell.Tab.0.left" timestamp="1663920587079">
+-      <screen x="0" y="0" width="1920" height="1050" />
+-    </state>
+-    <state width="1877" height="285" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1663920587079" />
+-    <state width="1877" height="285" key="GridCell.Tab.0.right" timestamp="1663920587080">
+-      <screen x="0" y="0" width="1920" height="1050" />
+-    </state>
+-    <state width="1877" height="285" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1663920587080" />
+-  </component>
+ </project>
+\ No newline at end of file
