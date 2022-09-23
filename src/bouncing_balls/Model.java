@@ -29,8 +29,8 @@ class Model {
 
         // Initialize the model with a few balls
         balls = new Ball[2];
-        balls[0] = new Ball(width / 3, height * .5, 2.0, 1, 0.5, 1);
-        balls[1] = new Ball(2 * width / 3, height * .5, -1.0, 0, 0.5, 1);
+        balls[0] = new Ball(width / 3, height * .5, 0, -1, 0.3, 1);
+        balls[1] = new Ball(2 * width / 3, height * .5, 0, 0, 0.4, 3);
 
         totalRadius = balls[0].radius + balls[1].radius;
     }
@@ -49,7 +49,7 @@ class Model {
 
         for (Ball b : balls) {
             // detect collision with the border
-            if (circlesIsIntersecting() && collisionTimer > 0.5) {
+            if (circlesIsIntersecting()) {
                 collisionTimer = 0;
                 // Calculate angle in radians between the x-axis and the line between the balls centres (l)
                 double slopeBetweenBalls = Vector.slopeBetweenTwoVectors(balls[0].position, balls[1].position);
@@ -84,20 +84,26 @@ class Model {
 
                 Vector projectedVectorAfterCollision1 = new Vector(v2fxr, projectedVector1.y);
 
-                Vector standardVectorAfterCollision0 = new Vector(
+                // Fix ball overlapping
+                double overlap = ball_0.radius + ball_1.radius - distanceBetween(ball_0, ball_1);
+                ball_0.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision0.x);
+                ball_1.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision1.x);
+                //System.out.println("b1: " + ball_0.position.x + " ball_1: " + ball_1.position.x);
+
+                Vector stdCartesianAfterCollision0 = new Vector(
                         Math.cos(radianAngleBetweenLines) * projectedVectorAfterCollision0.x +
                                 Math.cos(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision0.y,
                         Math.sin(radianAngleBetweenLines) * projectedVectorAfterCollision0.x +
                                 Math.sin(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision0.y);
 
-                Vector standardVectorAfterCollision1 = new Vector(
+                Vector stdCartesianAfterCollision1 = new Vector(
                         Math.cos(radianAngleBetweenLines) * projectedVectorAfterCollision1.x +
                                 Math.cos(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision1.y,
                         Math.sin(radianAngleBetweenLines) * projectedVectorAfterCollision1.x +
                                 Math.sin(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision1.y);
 
-                ball_0.velocity = standardVectorAfterCollision0;
-                ball_1.velocity = standardVectorAfterCollision1;
+                ball_0.velocity = stdCartesianAfterCollision0;
+                ball_1.velocity = stdCartesianAfterCollision1;
             }
 
             if (b.position.x < b.radius || b.position.x > areaWidth - b.radius) {
@@ -107,20 +113,35 @@ class Model {
                 b.velocity.y *= -1;
             }
 
-            if (!ballsIsFrozen) {
-                moveBalls(deltaT, b);
-            }
+            moveBalls(deltaT, b);
         }
     }
 
+    private double distanceBetween(Ball b1, Ball b2) {
+        double deltaY = b2.position.y - b1.position.y;
+        double deltaX = b2.position.x - b1.position.x;
+        return Math.sqrt(Math.pow(deltaY, 2) + Math.pow(deltaX, 2));
+    }
+
     private void moveBalls(double deltaT, Ball b) {
-        // compute new position according to the speed of the ball
-        b.oldPosition.x = b.position.x;
-        b.oldPosition.y = b.position.y;
+        if(b.position.x < b.radius)
+            b.position.x = b.radius;
+        else if(b.position.x > areaWidth - b.radius)
+            b.position.x = areaWidth - b.radius;
 
+        // Adjust position so no sex with floor
+        if(b.position.y < b.radius)
+            b.position.y = b.radius;
+        else if(b.position.y > areaHeight - b.radius)
+            b.position.y = areaHeight - b.radius;
 
+        // Gravity
+        b.velocity.y -= 9.82 * deltaT;
+
+        // Moves ball
         b.position.x += deltaT * b.velocity.x;
         b.position.y += deltaT * b.velocity.y;
+    
     }
 
     double calculateNewVelocityX(double mass1, double v1, double mass2, double v2) {
