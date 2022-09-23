@@ -15,98 +15,96 @@ class Model {
 
     Ball[] balls;
 
-    double totalRadius;
-
-    boolean ballsIsFrozen = false;
-
-    boolean hasCollided = false;
-
     Model(double width, double height) {
         areaWidth = width;
         areaHeight = height;
 
         // Initialize the model with a few balls
-        balls = new Ball[2];
-        balls[0] = new Ball(width / 3, height * .5, 0, -1, 0.3, 1);
-        balls[1] = new Ball(2 * width / 3, height * .5, 0, 0, 0.4, 3);
-
-        totalRadius = balls[0].radius + balls[1].radius;
+        balls = new Ball[4];
+        balls[0] = new Ball(width / 6, height * .8, 1, -1, 0.3, 2);
+        balls[1] = new Ball(2 * width / 6, height * .5, 0, 0, 0.4, 3);
+        balls[2] = new Ball(3 * width / 6, height * .5, 0, 0, 0.2, 1);
+        balls[3] = new Ball(width / 6, height * .3, 0, 0, 0.5, 4);
     }
 
 
     void step(double deltaT) {
-        // If mass is not assigned here it equals to 0
 
-        Ball ball_0 = balls[0];
-        Ball ball_1 = balls[1];
+        for (int i = 0; i < balls.length; i++) {
+            
+            Ball ball_0 = balls[i];
 
+            for(int j = i+1; j < balls.length; j++) {
 
-        for (Ball b : balls) {
-            // detect collision with the border
-            if (circlesIsIntersecting()) {
-                // Calculate angle in radians between the x-axis and the line between the balls centres (l)
-                double slopeBetweenBalls = Vector.slopeBetweenTwoVectors(balls[0].position, balls[1].position);
-                double slopeAxisX = 0;
-                double tanBetweenLines = acuteAngleBetweenLines(slopeBetweenBalls, slopeAxisX);
-                double radianAngleBetweenLines = Math.atan(tanBetweenLines);
+                Ball ball_1 = balls[j];
 
-                // Convert cartesian-vectors to polar-vectors
-                Vector polarVector0 = new Vector(Vector.vectorMagnitude(ball_0.velocity), ball_0.velocity.getDirectionInRadians());
-                Vector polarVector1 = new Vector(Vector.vectorMagnitude(ball_1.velocity), ball_1.velocity.getDirectionInRadians());
+                if (circlesIsIntersecting(ball_0, ball_1)) {
+                    // Calculate angle in radians between the x-axis and the line between the balls centres (l)
+                    double slopeBetweenBalls = Vector.slopeBetweenTwoVectors(ball_0.position, ball_1.position);
+                    double slopeAxisX = 0;
+                    double tanBetweenLines = acuteAngleBetweenLines(slopeBetweenBalls, slopeAxisX);
+                    double radianAngleBetweenLines = Math.atan(tanBetweenLines);
+    
+                    // Convert cartesian-vectors to polar-vectors
+                    Vector polarVector0 = new Vector(Vector.vectorMagnitude(ball_0.velocity), ball_0.velocity.getDirectionInRadians());
+                    Vector polarVector1 = new Vector(Vector.vectorMagnitude(ball_1.velocity), ball_1.velocity.getDirectionInRadians());
+    
+                    // Project the velocity vectors to the new system
+                    Vector projectedVector0 = new Vector(polarVector0.x * Math.cos(polarVector0.y - radianAngleBetweenLines),
+                            polarVector0.x * Math.sin(polarVector0.y - radianAngleBetweenLines));
+    
+                    Vector projectedVector1 = new Vector(polarVector1.x * Math.cos(polarVector1.y - radianAngleBetweenLines),
+                            polarVector1.x * Math.sin(polarVector1.y - radianAngleBetweenLines));
+    
+                    double initialProjectedVelocityX0 = projectedVector0.x;
+                    double initialProjectedVelocityX1 = projectedVector1.x;
+    
+                    double v1fxr = ((ball_0.mass - ball_1.mass) * initialProjectedVelocityX0 +
+                            (ball_1.mass + ball_1.mass) * initialProjectedVelocityX1) /
+                            (ball_0.mass + ball_1.mass);
+    
+                    double v2fxr = ((ball_0.mass + ball_0.mass) * initialProjectedVelocityX0 +
+                            (ball_1.mass - ball_0.mass) * initialProjectedVelocityX1) /
+                            (ball_0.mass + ball_1.mass);
+    
+                    Vector projectedVectorAfterCollision0 = new Vector(
+                            v1fxr, projectedVector0.y);
+    
+                    Vector projectedVectorAfterCollision1 = new Vector(v2fxr, projectedVector1.y);
+    
+                    // Fix ball overlapping
+                    double overlap = ball_0.radius + ball_1.radius - distanceBetween(ball_0, ball_1);
+                    ball_0.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision0.x);
+                    ball_1.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision1.x);
+    
+                    Vector stdCartesianAfterCollision0 = new Vector(
+                            Math.cos(radianAngleBetweenLines) * projectedVectorAfterCollision0.x +
+                                    Math.cos(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision0.y,
+                            Math.sin(radianAngleBetweenLines) * projectedVectorAfterCollision0.x +
+                                    Math.sin(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision0.y);
+    
+                    Vector stdCartesianAfterCollision1 = new Vector(
+                            Math.cos(radianAngleBetweenLines) * projectedVectorAfterCollision1.x +
+                                    Math.cos(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision1.y,
+                            Math.sin(radianAngleBetweenLines) * projectedVectorAfterCollision1.x +
+                                    Math.sin(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision1.y);
+    
+                    ball_0.velocity = stdCartesianAfterCollision0;
+                    ball_1.velocity = stdCartesianAfterCollision1;
+                }
+                
+            }
+            
 
-                // Project the velocity vectors to the new system
-                Vector projectedVector0 = new Vector(polarVector0.x * Math.cos(polarVector0.y - radianAngleBetweenLines),
-                        polarVector0.x * Math.sin(polarVector0.y - radianAngleBetweenLines));
-
-                Vector projectedVector1 = new Vector(polarVector1.x * Math.cos(polarVector1.y - radianAngleBetweenLines),
-                        polarVector1.x * Math.sin(polarVector1.y - radianAngleBetweenLines));
-
-                double initialProjectedVelocityX0 = projectedVector0.x;
-                double initialProjectedVelocityX1 = projectedVector1.x;
-
-                double v1fxr = ((ball_0.mass - ball_1.mass) * initialProjectedVelocityX0 +
-                        (ball_1.mass + ball_1.mass) * initialProjectedVelocityX1) /
-                        (ball_0.mass + ball_1.mass);
-
-                double v2fxr = ((ball_0.mass + ball_0.mass) * initialProjectedVelocityX0 +
-                        (ball_1.mass - ball_0.mass) * initialProjectedVelocityX1) /
-                        (ball_0.mass + ball_1.mass);
-
-                Vector projectedVectorAfterCollision0 = new Vector(
-                        v1fxr, projectedVector0.y);
-
-                Vector projectedVectorAfterCollision1 = new Vector(v2fxr, projectedVector1.y);
-
-                // Fix ball overlapping
-                double overlap = ball_0.radius + ball_1.radius - distanceBetween(ball_0, ball_1);
-                ball_0.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision0.x);
-                ball_1.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision1.x);
-                //System.out.println("b1: " + ball_0.position.x + " ball_1: " + ball_1.position.x);
-
-                Vector stdCartesianAfterCollision0 = new Vector(
-                        Math.cos(radianAngleBetweenLines) * projectedVectorAfterCollision0.x +
-                                Math.cos(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision0.y,
-                        Math.sin(radianAngleBetweenLines) * projectedVectorAfterCollision0.x +
-                                Math.sin(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision0.y);
-
-                Vector stdCartesianAfterCollision1 = new Vector(
-                        Math.cos(radianAngleBetweenLines) * projectedVectorAfterCollision1.x +
-                                Math.cos(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision1.y,
-                        Math.sin(radianAngleBetweenLines) * projectedVectorAfterCollision1.x +
-                                Math.sin(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision1.y);
-
-                ball_0.velocity = stdCartesianAfterCollision0;
-                ball_1.velocity = stdCartesianAfterCollision1;
+            if (ball_0.position.x < ball_0.radius || ball_0.position.x > areaWidth - ball_0.radius) {
+                ball_0.velocity.x *= -1; // change direction of ball
+            }
+            if (ball_0.position.y < ball_0.radius || ball_0.position.y > areaHeight - ball_0.radius) {
+                ball_0.velocity.y *= -1;
             }
 
-            if (b.position.x < b.radius || b.position.x > areaWidth - b.radius) {
-                b.velocity.x *= -1; // change direction of ball
-            }
-            if (b.position.y < b.radius || b.position.y > areaHeight - b.radius) {
-                b.velocity.y *= -1;
-            }
-
-            moveBalls(deltaT, b);
+            moveBalls(deltaT, ball_0);
+        
         }
     }
 
@@ -143,9 +141,10 @@ class Model {
                 ((2 * mass2) / (mass1 + mass2)) * v2;
     }
 
-    boolean circlesIsIntersecting() {
+    boolean circlesIsIntersecting(Ball b1, Ball b2) {
         // Pythagoras
-        double distanceBetweenCircles = Math.sqrt(Math.pow(balls[0].position.x - balls[1].position.x, 2) + Math.pow(balls[0].position.y - balls[1].position.y, 2));
+        double distanceBetweenCircles = Math.sqrt(Math.pow(b1.position.x - b2.position.x, 2) + Math.pow(b1.position.y - b2.position.y, 2));
+        double totalRadius = b1.radius + b2.radius;
         return distanceBetweenCircles < totalRadius;
     }
 
