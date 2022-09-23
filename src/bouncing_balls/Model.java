@@ -30,8 +30,8 @@ class Model {
 
         // Initialize the model with a few balls
         balls = new Ball[2];
-        balls[0] = new Ball(width / 4, height * 0.9, 1, -1, 0.2, 2);
-        balls[1] = new Ball(3 * width / 4, height * 0.1, -1, 1, 0.2, 2);
+        balls[0] = new Ball(width / 4, height * 0.1, 1, 1, 0.2, 2);
+        balls[1] = new Ball(3 * width / 4, height * 0.9, -1, -1, 0.4, 2);
 
         totalRadius = balls[0].radius + balls[1].radius;
     }
@@ -119,14 +119,33 @@ class Model {
         double [][] rotationInverse = generateInverseRotationMatrix(contactAngle);
 
 
-        if(b1.position.x > b2.position.x) {
-            b1.position.x = b2.position.x + (b1.radius + b2.radius) * Math.cos(contactAngle);
-            b1.position.y = b2.position.y + (b1.radius + b2.radius) * Math.sin(contactAngle);
-        }
-        else {
-            b2.position.x = b1.position.x + (b1.radius + b2.radius) * Math.cos(contactAngle);
-            b2.position.y = b1.position.y + (b1.radius + b2.radius) * Math.sin(contactAngle);
-        }
+
+        double totRadius = b1.radius + b2.radius;
+
+        System.out.println("Angle: " + contactAngle*180/Math.PI);
+
+        // if((b1.position.x > b2.position.x) && (b1.position.y > b2.position.y)) {
+        //     System.out.println("kvadrant 1");
+        //     b1.position.x = b2.position.x + totRadius * Math.cos(contactAngle);
+        //     b1.position.y = b2.position.y + totRadius * Math.sin(contactAngle);
+        // }
+        // else if(b1.position.x < b2.position.x && (b1.position.y > b2.position.y)){
+        //     System.out.println("kvadrant 2");
+        //     b2.position.x = b1.position.x + totRadius * Math.cos(Math.PI/2 + contactAngle);
+        //     b2.position.y = b1.position.y + totRadius * Math.sin(Math.PI/2 + contactAngle);
+        // }
+        // else if((b1.position.x < b2.position.x) && (b1.position.y < b2.position.y)) {
+        //     System.out.println("kvadrant 3");
+
+         
+        // }
+        // else if((b1.position.x > b2.position.x) && (b1.position.y < b2.position.y)) {
+        //     System.out.println("kvadrant 4");
+        //     b1.position.x = b2.position.x + totRadius * Math.cos(contactAngle);
+        //     b1.position.y = b2.position.y + totRadius * Math.sin(contactAngle);
+        // }
+    
+        
 
 
         //Vector p1 = b1.position;
