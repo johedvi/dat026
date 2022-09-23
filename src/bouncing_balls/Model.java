@@ -19,8 +19,6 @@ class Model {
 
     boolean ballsIsFrozen = false;
 
-    double collisionTimer = 0;
-
     boolean hasCollided = false;
 
     Model(double width, double height) {
@@ -29,8 +27,8 @@ class Model {
 
         // Initialize the model with a few balls
         balls = new Ball[2];
-        balls[0] = new Ball(width / 3, height * .5, 1, -1, 0.3, 1);
-        balls[1] = new Ball(2 * width / 3, height * .5, 1, 0, 0.4, 3);
+        balls[0] = new Ball(width / 3, height * .5, 0, -1, 0.3, 1);
+        balls[1] = new Ball(2 * width / 3, height * .5, 0, 0, 0.4, 3);
 
         totalRadius = balls[0].radius + balls[1].radius;
     }
@@ -42,16 +40,10 @@ class Model {
         Ball ball_0 = balls[0];
         Ball ball_1 = balls[1];
 
-        ball_0.mass = 2;
-        ball_1.mass = 4;
-
-
-        collisionTimer += deltaT;
 
         for (Ball b : balls) {
             // detect collision with the border
             if (circlesIsIntersecting()) {
-                collisionTimer = 0;
                 // Calculate angle in radians between the x-axis and the line between the balls centres (l)
                 double slopeBetweenBalls = Vector.slopeBetweenTwoVectors(balls[0].position, balls[1].position);
                 double slopeAxisX = 0;
@@ -143,9 +135,6 @@ class Model {
         b.position.x += deltaT * b.velocity.x;
         b.position.y += deltaT * b.velocity.y;
 
-        if (b.mass < 2) {
-            System.out.println(b.velocity.y);
-        }
     }
 
     double calculateNewVelocityX(double mass1, double v1, double mass2, double v2) {
@@ -194,9 +183,10 @@ class Model {
         double mass;
 
         Ball(double x, double y, double vx, double vy, double r, double m) {
-            position = new Vector(x, y);
-            velocity = new Vector(vx, vy);
-            radius = r;
+            this.position = new Vector(x, y);
+            this.velocity = new Vector(vx, vy);
+            this.radius = r;
+            this.mass = m;
         }
     }
 
