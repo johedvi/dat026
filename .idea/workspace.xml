@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -19,13 +22,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e00698ba-c8e7-47f3-ac87-2f82fc391fe5" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/dat026.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="e00698ba-c8e7-47f3-ac87-2f82fc391fe5" name="Default Changelist" comment="Nice bounce yall">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Model$Ball.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Model$Ball.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Model.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Model.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Vector.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Vector.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/bouncing_balls/Model.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/bouncing_balls/Model.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +35,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="valle2" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MavenImportPreferences">
@@ -50,7 +57,12 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
   </component>
   <component name="RunManager">
     <configuration name="Animator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -81,6 +93,14 @@
       <option name="presentableId" value="Default" />
       <updated>1663879954512</updated>
     </task>
+    <task id="LOCAL-00001" summary="Nice bounce yall">
+      <created>1663941898799</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1663941898799</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -94,22 +114,8 @@
       </map>
     </option>
   </component>
-  <component name="WindowStateProjectService">
-    <state width="1877" height="285" key="GridCell.Tab.0.bottom" timestamp="1663920587080">
-      <screen x="0" y="0" width="1920" height="1050" />
-    </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1663920587080" />
-    <state width="1877" height="285" key="GridCell.Tab.0.center" timestamp="1663920587079">
-      <screen x="0" y="0" width="1920" height="1050" />
-    </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1663920587079" />
-    <state width="1877" height="285" key="GridCell.Tab.0.left" timestamp="1663920587079">
-      <screen x="0" y="0" width="1920" height="1050" />
-    </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1663920587079" />
-    <state width="1877" height="285" key="GridCell.Tab.0.right" timestamp="1663920587080">
-      <screen x="0" y="0" width="1920" height="1050" />
-    </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1663920587080" />
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Nice bounce yall" />
+    <option name="LAST_COMMIT_MESSAGE" value="Nice bounce yall" />
   </component>
 </project>

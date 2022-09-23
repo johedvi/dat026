@@ -42,8 +42,8 @@ class Model {
         Ball ball_0 = balls[0];
         Ball ball_1 = balls[1];
 
-        ball_0.mass = 1;
-        ball_1.mass = 1;
+
+
 
         collisionTimer += deltaT;
 
@@ -141,7 +141,10 @@ class Model {
         // Moves ball
         b.position.x += deltaT * b.velocity.x;
         b.position.y += deltaT * b.velocity.y;
-    
+
+        if (b.mass < 2) {
+            System.out.println(b.velocity.y);
+        }
     }
 
     double calculateNewVelocityX(double mass1, double v1, double mass2, double v2) {
