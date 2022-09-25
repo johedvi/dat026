@@ -17,7 +17,7 @@ class Model {
 
     double totalRadius;
 
-    double gravity = 0.3;
+    double gravity = 9.82;
     Model(double width, double height) {
         areaWidth = width;
         areaHeight = height;
@@ -57,20 +57,21 @@ class Model {
                 Vector projectedVector1 = new Vector(polarVector1.x * Math.cos(polarVector1.y - collisionAngle),
                         polarVector1.x * Math.sin(polarVector1.y - collisionAngle));
 
+                // Cache the initial projected x-component of the velocity vector
                 double initialProjectedVelocityX0 = projectedVector0.x;
                 double initialProjectedVelocityX1 = projectedVector1.x;
 
+                // Calculate the resulting velocity in the projected space
                 double projectedVelocityPostCollisionX0 = ((ball_0.mass - ball_1.mass) * initialProjectedVelocityX0 +
                         (ball_1.mass + ball_1.mass) * initialProjectedVelocityX1) /
                         (ball_0.mass + ball_1.mass);
-
                 double projectedVelocityPostCollisionX1 = ((ball_0.mass + ball_0.mass) * initialProjectedVelocityX0 +
                         (ball_1.mass - ball_0.mass) * initialProjectedVelocityX1) /
                         (ball_0.mass + ball_1.mass);
 
+                // Construct a new vector with the new x-component
                 Vector projectedVectorAfterCollision0 = new Vector(
                         projectedVelocityPostCollisionX0, projectedVector0.y);
-
                 Vector projectedVectorAfterCollision1 = new Vector(projectedVelocityPostCollisionX1, projectedVector1.y);
 
                 // Fix ball overlapping
@@ -78,18 +79,19 @@ class Model {
                 ball_0.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision0.x);
                 ball_1.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision1.x);
 
+                // Convert back to standard cartesian 2D space
                 Vector stdCartesianAfterCollision0 = new Vector(
                         Math.cos(collisionAngle) * projectedVectorAfterCollision0.x +
                                 Math.cos(collisionAngle + Math.PI / 2.0) * projectedVectorAfterCollision0.y,
                         Math.sin(collisionAngle) * projectedVectorAfterCollision0.x +
                                 Math.sin(collisionAngle + Math.PI / 2.0) * projectedVectorAfterCollision0.y);
-
                 Vector stdCartesianAfterCollision1 = new Vector(
                         Math.cos(collisionAngle) * projectedVectorAfterCollision1.x +
                                 Math.cos(collisionAngle + Math.PI / 2.0) * projectedVectorAfterCollision1.y,
                         Math.sin(collisionAngle) * projectedVectorAfterCollision1.x +
                                 Math.sin(collisionAngle + Math.PI / 2.0) * projectedVectorAfterCollision1.y);
 
+                // Assign the new velocity
                 ball_0.velocity = stdCartesianAfterCollision0;
                 ball_1.velocity = stdCartesianAfterCollision1;
             }
@@ -102,6 +104,8 @@ class Model {
             }
 
             moveBalls(deltaT, b);
+
+
         }
     }
 
@@ -123,7 +127,7 @@ class Model {
             b.position.y = areaHeight - b.radius;
 
         // Gravity
-        b.velocity.y -= gravity;
+        b.velocity.y -= gravity * deltaT;
 
         // Moves ball
         b.position.x += deltaT * b.velocity.x;
