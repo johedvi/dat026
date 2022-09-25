@@ -18,13 +18,14 @@ class Model {
     double totalRadius;
 
     double gravity = 9.82;
+
     Model(double width, double height) {
         areaWidth = width;
         areaHeight = height;
 
         // Initialize the model with a few balls
         balls = new Ball[2];
-        balls[0] = new Ball(width / 3, height * .5, 0, 0, 0.3, 1);
+        balls[0] = new Ball(width / 3, height * .5, 0, 1, 0.3, 1);
         balls[1] = new Ball(2 * width / 3, height * .5, 0, 0, 0.3, 1);
 
         totalRadius = balls[0].radius + balls[1].radius;
@@ -36,7 +37,6 @@ class Model {
 
         Ball ball_0 = balls[0];
         Ball ball_1 = balls[1];
-
 
         for (Ball b : balls) {
             if (circlesIsIntersecting()) {
@@ -97,14 +97,13 @@ class Model {
             }
 
             if (b.position.x < b.radius || b.position.x > areaWidth - b.radius) {
-                b.velocity.x *= -1; // change direction of ball
+                b.velocity.x *= -1.0; // change direction of ball
             }
             if (b.position.y < b.radius || b.position.y > areaHeight - b.radius) {
-                b.velocity.y *= -1;
+                b.velocity.y *= -1.0;
             }
 
             moveBalls(deltaT, b);
-
 
         }
     }
@@ -116,14 +115,14 @@ class Model {
     }
 
     private void moveBalls(double deltaT, Ball b) {
-        if(b.position.x < b.radius)
+        if (b.position.x < b.radius)
             b.position.x = b.radius;
-        else if(b.position.x > areaWidth - b.radius)
+        else if (b.position.x > areaWidth - b.radius)
             b.position.x = areaWidth - b.radius;
 
-        if(b.position.y < b.radius)
+        if (b.position.y < b.radius)
             b.position.y = b.radius;
-        else if(b.position.y > areaHeight - b.radius)
+        else if (b.position.y > areaHeight - b.radius)
             b.position.y = areaHeight - b.radius;
 
         // Gravity
