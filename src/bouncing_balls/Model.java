@@ -46,37 +46,37 @@ class Model {
                 double collisionAngle = horizontalDelta == 0 ? (Math.PI / 2.0) : Math.atan(verticalDelta / horizontalDelta);
 
                 // Convert cartesian-vectors to polar-vectors
-                Vector polarVector0 = new Vector(Vector.vectorMagnitude(ball_0.velocity), ball_0.velocity.getDirectionInRadians());
-                Vector polarVector1 = new Vector(Vector.vectorMagnitude(ball_1.velocity), ball_1.velocity.getDirectionInRadians());
+                Vector polarVector0 = new Vector(Vector.vectorMagnitude(ball_0.velocity),
+                        ball_0.velocity.getDirectionInRadians());
+                Vector polarVector1 = new Vector(Vector.vectorMagnitude(ball_1.velocity),
+                        ball_1.velocity.getDirectionInRadians());
 
                 // Project the velocity vectors to the new system
                 Vector projectedVector0 = new Vector(polarVector0.x * Math.cos(polarVector0.y - collisionAngle),
                         polarVector0.x * Math.sin(polarVector0.y - collisionAngle));
-
                 Vector projectedVector1 = new Vector(polarVector1.x * Math.cos(polarVector1.y - collisionAngle),
                         polarVector1.x * Math.sin(polarVector1.y - collisionAngle));
 
                 double initialProjectedVelocityX0 = projectedVector0.x;
                 double initialProjectedVelocityX1 = projectedVector1.x;
 
-                double v1fxr = ((ball_0.mass - ball_1.mass) * initialProjectedVelocityX0 +
+                double projectedVelocityPostCollisionX0 = ((ball_0.mass - ball_1.mass) * initialProjectedVelocityX0 +
                         (ball_1.mass + ball_1.mass) * initialProjectedVelocityX1) /
                         (ball_0.mass + ball_1.mass);
 
-                double v2fxr = ((ball_0.mass + ball_0.mass) * initialProjectedVelocityX0 +
+                double projectedVelocityPostCollisionX1 = ((ball_0.mass + ball_0.mass) * initialProjectedVelocityX0 +
                         (ball_1.mass - ball_0.mass) * initialProjectedVelocityX1) /
                         (ball_0.mass + ball_1.mass);
 
                 Vector projectedVectorAfterCollision0 = new Vector(
-                        v1fxr, projectedVector0.y);
+                        projectedVelocityPostCollisionX0, projectedVector0.y);
 
-                Vector projectedVectorAfterCollision1 = new Vector(v2fxr, projectedVector1.y);
+                Vector projectedVectorAfterCollision1 = new Vector(projectedVelocityPostCollisionX1, projectedVector1.y);
 
                 // Fix ball overlapping
                 double overlap = ball_0.radius + ball_1.radius - distanceBetween(ball_0, ball_1);
                 ball_0.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision0.x);
                 ball_1.position.x += overlap / 2 * Math.signum(projectedVectorAfterCollision1.x);
-                //System.out.println("b1: " + ball_0.position.x + " ball_1: " + ball_1.position.x);
 
                 Vector stdCartesianAfterCollision0 = new Vector(
                         Math.cos(collisionAngle) * projectedVectorAfterCollision0.x +
