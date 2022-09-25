@@ -17,18 +17,15 @@ class Model {
 
     double totalRadius;
 
-    boolean ballsIsFrozen = false;
-
-    boolean hasCollided = false;
-
+    double gravity = 0.3;
     Model(double width, double height) {
         areaWidth = width;
         areaHeight = height;
 
         // Initialize the model with a few balls
         balls = new Ball[2];
-        balls[0] = new Ball(width / 3, height * .5, 0, -1, 0.3, 1);
-        balls[1] = new Ball(2 * width / 3, height * .5, 0, 0, 0.4, 3);
+        balls[0] = new Ball(width / 3, height * .5, 0, 0, 0.3, 1);
+        balls[1] = new Ball(2 * width / 3, height * .5, 0, 0, 0.3, 1);
 
         totalRadius = balls[0].radius + balls[1].radius;
     }
@@ -42,24 +39,22 @@ class Model {
 
 
         for (Ball b : balls) {
-            // detect collision with the border
             if (circlesIsIntersecting()) {
-                // Calculate angle in radians between the x-axis and the line between the balls centres (l)
-                double slopeBetweenBalls = Vector.slopeBetweenTwoVectors(balls[0].position, balls[1].position);
-                double slopeAxisX = 0;
-                double tanBetweenLines = acuteAngleBetweenLines(slopeBetweenBalls, slopeAxisX);
-                double radianAngleBetweenLines = Math.atan(tanBetweenLines);
+                // Calculate collision angle
+                double horizontalDelta = balls[0].position.x - balls[1].position.x;
+                double verticalDelta = balls[0].position.y - balls[1].position.y;
+                double collisionAngle = horizontalDelta == 0 ? (Math.PI / 2.0) : Math.atan(verticalDelta / horizontalDelta);
 
                 // Convert cartesian-vectors to polar-vectors
                 Vector polarVector0 = new Vector(Vector.vectorMagnitude(ball_0.velocity), ball_0.velocity.getDirectionInRadians());
                 Vector polarVector1 = new Vector(Vector.vectorMagnitude(ball_1.velocity), ball_1.velocity.getDirectionInRadians());
 
                 // Project the velocity vectors to the new system
-                Vector projectedVector0 = new Vector(polarVector0.x * Math.cos(polarVector0.y - radianAngleBetweenLines),
-                        polarVector0.x * Math.sin(polarVector0.y - radianAngleBetweenLines));
+                Vector projectedVector0 = new Vector(polarVector0.x * Math.cos(polarVector0.y - collisionAngle),
+                        polarVector0.x * Math.sin(polarVector0.y - collisionAngle));
 
-                Vector projectedVector1 = new Vector(polarVector1.x * Math.cos(polarVector1.y - radianAngleBetweenLines),
-                        polarVector1.x * Math.sin(polarVector1.y - radianAngleBetweenLines));
+                Vector projectedVector1 = new Vector(polarVector1.x * Math.cos(polarVector1.y - collisionAngle),
+                        polarVector1.x * Math.sin(polarVector1.y - collisionAngle));
 
                 double initialProjectedVelocityX0 = projectedVector0.x;
                 double initialProjectedVelocityX1 = projectedVector1.x;
@@ -84,16 +79,16 @@ class Model {
                 //System.out.println("b1: " + ball_0.position.x + " ball_1: " + ball_1.position.x);
 
                 Vector stdCartesianAfterCollision0 = new Vector(
-                        Math.cos(radianAngleBetweenLines) * projectedVectorAfterCollision0.x +
-                                Math.cos(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision0.y,
-                        Math.sin(radianAngleBetweenLines) * projectedVectorAfterCollision0.x +
-                                Math.sin(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision0.y);
+                        Math.cos(collisionAngle) * projectedVectorAfterCollision0.x +
+                                Math.cos(collisionAngle + Math.PI / 2.0) * projectedVectorAfterCollision0.y,
+                        Math.sin(collisionAngle) * projectedVectorAfterCollision0.x +
+                                Math.sin(collisionAngle + Math.PI / 2.0) * projectedVectorAfterCollision0.y);
 
                 Vector stdCartesianAfterCollision1 = new Vector(
-                        Math.cos(radianAngleBetweenLines) * projectedVectorAfterCollision1.x +
-                                Math.cos(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision1.y,
-                        Math.sin(radianAngleBetweenLines) * projectedVectorAfterCollision1.x +
-                                Math.sin(radianAngleBetweenLines + Math.PI / 2.0) * projectedVectorAfterCollision1.y);
+                        Math.cos(collisionAngle) * projectedVectorAfterCollision1.x +
+                                Math.cos(collisionAngle + Math.PI / 2.0) * projectedVectorAfterCollision1.y,
+                        Math.sin(collisionAngle) * projectedVectorAfterCollision1.x +
+                                Math.sin(collisionAngle + Math.PI / 2.0) * projectedVectorAfterCollision1.y);
 
                 ball_0.velocity = stdCartesianAfterCollision0;
                 ball_1.velocity = stdCartesianAfterCollision1;
@@ -122,14 +117,13 @@ class Model {
         else if(b.position.x > areaWidth - b.radius)
             b.position.x = areaWidth - b.radius;
 
-        // Adjust position so no sex with floor
         if(b.position.y < b.radius)
             b.position.y = b.radius;
         else if(b.position.y > areaHeight - b.radius)
             b.position.y = areaHeight - b.radius;
 
         // Gravity
-        b.velocity.y -= 9.82 * deltaT;
+        b.velocity.y -= gravity;
 
         // Moves ball
         b.position.x += deltaT * b.velocity.x;
@@ -149,7 +143,7 @@ class Model {
         return distanceBetweenCircles < totalRadius;
     }
 
-    double acuteAngleBetweenLines(double slope1, double slope2) {
+    double collisionAngleWithRegardsToAxisX(double slope1, double slope2) {
         return (slope1 - slope2) / (1 + (slope1 * slope2));
     }
 

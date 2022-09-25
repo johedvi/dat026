@@ -23,9 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e00698ba-c8e7-47f3-ac87-2f82fc391fe5" name="Default Changelist" comment="Commit som funkar">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Model$Ball.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Model$Ball.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Model.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Model.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Vector.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/dat026/bouncing_balls/Vector.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/bouncing_balls/Model.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/bouncing_balls/Model.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/bouncing_balls/Vector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/bouncing_balls/Vector.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,16 +126,5 @@
     <MESSAGE value="Nice bounce yall" />
     <MESSAGE value="Commit som funkar" />
     <option name="LAST_COMMIT_MESSAGE" value="Commit som funkar" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/bouncing_balls/Model.java</url>
-          <line>146</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

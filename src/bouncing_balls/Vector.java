@@ -12,10 +12,8 @@ public class Vector {
     }
 
     public static double slopeBetweenTwoVectors(Vector v1, Vector v2) {
-        if (v1.x - v2.x == 0) {
-            return Math.PI / 2;
-        } else
-            return (v1.y - v2.y) / (v1.x - v2.x);
+        return 0;
+
     }
 
     public static Vector vectorMatrixTransformation(double[][] transformationMatrix, Vector v) {
